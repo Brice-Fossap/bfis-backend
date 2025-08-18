@@ -16,7 +16,8 @@ import java.time.Instant;
 @AllArgsConstructor
 @SuperBuilder
 @MappedSuperclass
-public class AbstractEntity {
+@EntityListeners(AuditableEntityListener.class)
+public class AuditableEntity {
 
     @CreationTimestamp
     @Column(name = "created_at")

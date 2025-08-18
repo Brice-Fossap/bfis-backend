@@ -1,13 +1,12 @@
 package com.fosebri.bfis.entity;
 
-import com.fosebri.bfis.secutity.service.Argon2PasswordHasher;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.fosebri.bfis.enums.UserRole;
+import com.fosebri.bfis.secutity.service.BCryptPasswordHash;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -17,7 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
-public class User extends AbstractEntity {
+public class User extends AuditableEntity {
 
     @Id
     @Column(name = "id", nullable = false)
@@ -33,11 +32,22 @@ public class User extends AbstractEntity {
     @Column(name = "enabled", nullable = false)
     private boolean enabled = true;
 
-    public void setPassword(String plainPassword, Argon2PasswordHasher hasher) {
-        this.password = hasher.hash(plainPassword);
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private UserRole role;
+
+    @Column(name = "refresh_token")
+    private UUID refreshToken;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "expiry")
+    private Instant expiry;
+
+    public void setPassword(String plainPassword, BCryptPasswordHash hasher) {
+        this.password = hasher.generate(plainPassword.toCharArray());
     }
 
-    public boolean verifyPassword(String plainPassword, Argon2PasswordHasher hasher) {
-        return hasher.verify(plainPassword, this.password);
+    public boolean verifyPassword(String plainPassword, BCryptPasswordHash hasher) {
+        return hasher.verify(plainPassword.toCharArray(), this.password);
     }
 }
