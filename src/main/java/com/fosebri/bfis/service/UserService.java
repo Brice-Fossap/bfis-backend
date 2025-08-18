@@ -1,17 +1,20 @@
 package com.fosebri.bfis.service;
 
-import com.fosebri.bfis.dto.*;
+import com.fosebri.bfis.dto.user.*;
 import com.fosebri.bfis.entity.User;
 import com.fosebri.bfis.exception.ChangePasswordException;
 import com.fosebri.bfis.exception.ResourceAlreadyExistsException;
 import com.fosebri.bfis.exception.ResourceNotFoundException;
 import com.fosebri.bfis.generator.IdGenerator;
 import com.fosebri.bfis.repository.UserRepository;
-import com.fosebri.bfis.secutity.service.Argon2PasswordHasher;
+import com.fosebri.bfis.secutity.service.BCryptPasswordHash;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.SecurityContext;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @ApplicationScoped
@@ -24,7 +27,10 @@ public class UserService {
     private IdGenerator idGenerator;
 
     @Inject
-    private Argon2PasswordHasher passwordHasher;
+    private BCryptPasswordHash passwordHash;
+
+    @Context
+    private SecurityContext securityContext;
 
     public CreateUserResponse createUser(CreateUserRequest request) {
         if (userRepository.existsByUsername(request.username())) {
@@ -32,7 +38,7 @@ public class UserService {
         }
 
         var user = request.toUser(idGenerator.next());
-        user.setPassword(request.password(), passwordHasher);
+        user.setPassword(request.password(), passwordHash);
         return CreateUserResponse.fromUser(userRepository.save(user));
     }
 
@@ -61,6 +67,29 @@ public class UserService {
     public List<GetUsersResponse> getUsers() {
         var users = userRepository.findUsers();
         return GetUsersResponse.fromUsers(users);
+    }
+
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + username));
+    }
+
+    public Optional<User> getCurrentUserThrows() {
+        if (securityContext.getUserPrincipal() == null) {
+            throw new IllegalStateException("No users connected");
+        }
+
+        String username = securityContext.getUserPrincipal().getName();
+        return userRepository.findByUsername(username);
+    }
+
+    public Optional<User> getCurrentUser() {
+        if (securityContext.getUserPrincipal() == null) {
+            return Optional.empty();
+        }
+
+        String username = securityContext.getUserPrincipal().getName();
+        return userRepository.findByUsername(username);
     }
 
     private User validateUser(UUID userId) {

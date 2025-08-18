@@ -1,9 +1,11 @@
-package com.fosebri.bfis.resource;
+package com.fosebri.bfis.controller;
 
-import com.fosebri.bfis.dto.ChangePasswordRequest;
-import com.fosebri.bfis.dto.ChangeUserStatusRequest;
-import com.fosebri.bfis.dto.CreateUserRequest;
+import com.fosebri.bfis.dto.user.ChangePasswordRequest;
+import com.fosebri.bfis.dto.user.ChangeUserStatusRequest;
+import com.fosebri.bfis.dto.user.CreateUserRequest;
 import com.fosebri.bfis.service.UserService;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
@@ -16,12 +18,14 @@ import java.util.UUID;
 @Path("/users")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class UserResource {
+@ApplicationScoped
+public class UserController {
 
     @Inject
     private UserService userService;
 
     @POST
+    @RolesAllowed({"SUPER_ADMIN", "ADMIN", "USER"})
     public Response createUser(@Valid CreateUserRequest request) {
         var userCreated = userService.createUser(request);
         return Response.created(URI.create("/users/" + userCreated.id()))
@@ -31,6 +35,7 @@ public class UserResource {
 
     @PATCH
     @Path("/change-password/{id}")
+    @RolesAllowed({"SUPER_ADMIN", "ADMIN", "USER"})
     public Response changeUserPassword(@PathParam("id") UUID userId, @Valid ChangePasswordRequest request) {
         userService.changeUserPassword(userId, request);
         return Response.ok().build();
@@ -38,6 +43,7 @@ public class UserResource {
 
     @PATCH
     @Path("/change-status/{id}")
+    @RolesAllowed({"SUPER_ADMIN", "ADMIN", "USER"})
     public Response changeUserStatus(
             @PathParam("id") UUID userId,
             @Valid ChangeUserStatusRequest request
@@ -48,11 +54,13 @@ public class UserResource {
 
     @GET
     @Path("/{id}")
+    @RolesAllowed({"SUPER_ADMIN", "ADMIN", "USER"})
     public Response getUser(@PathParam("id") UUID userId) {
         return Response.ok(userService.getUser(userId)).build();
     }
 
     @GET
+    @RolesAllowed({"SUPER_ADMIN", "ADMIN", "USER"})
     public Response getUsers() {
         return Response.ok(userService.getUsers()).build();
     }

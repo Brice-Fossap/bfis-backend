@@ -17,7 +17,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class Person extends AbstractEntity {
+public abstract class Person extends AuditableEntity {
 
     @Id
     @Column(name = "id", nullable = false)
@@ -38,7 +38,7 @@ public abstract class Person extends AbstractEntity {
     @Column(name = "address", nullable = false)
     protected String address;
 
-    @OneToOne
+    /*@OneToOne
     @JoinColumn(name = "user")
-    protected User user;
+    protected User user;*/
 }

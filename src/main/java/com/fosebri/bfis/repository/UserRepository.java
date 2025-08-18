@@ -17,7 +17,11 @@ public interface UserRepository {
 
     Optional<User> findById(UUID id);
 
+    Optional<User> findByRefreshToken(UUID refreshToken);
+
     List<User> findUsers();
 
     boolean existsByUsername(String username);
+
+    User getReferenceById(UUID id);
 }

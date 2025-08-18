@@ -1,4 +1,4 @@
-package com.fosebri.bfis.dto;
+package com.fosebri.bfis.dto.user;
 
 import jakarta.validation.constraints.NotNull;
 

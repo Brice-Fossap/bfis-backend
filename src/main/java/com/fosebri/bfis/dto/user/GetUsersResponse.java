@@ -1,4 +1,4 @@
-package com.fosebri.bfis.dto;
+package com.fosebri.bfis.dto.user;
 
 import com.fosebri.bfis.entity.User;
 

@@ -2,7 +2,7 @@ package com.fosebri.bfis.repository.impl;
 
 import com.fosebri.bfis.entity.User;
 import com.fosebri.bfis.repository.UserRepository;
-import com.fosebri.bfis.secutity.service.Argon2PasswordHasher;
+import com.fosebri.bfis.secutity.service.BCryptPasswordHash;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -21,7 +21,7 @@ public class JpaUserRepository implements UserRepository {
     private EntityManager entityManager;
 
     @Inject
-    private Argon2PasswordHasher passwordHasher;
+    private BCryptPasswordHash passwordHasher;
 
     @Override
     public User save(User user) {
@@ -47,12 +47,23 @@ public class JpaUserRepository implements UserRepository {
 
     @Override
     public Optional<User> findByUsername(String username) {
-        return Optional.ofNullable(entityManager.find(User.class, username));
+        return entityManager.createQuery("SELECT u FROM User u WHERE u.username = :username", User.class)
+                .setParameter("username", username)
+                .getResultStream()
+                .findFirst();
     }
 
     @Override
     public Optional<User> findById(UUID id) {
         return Optional.ofNullable(entityManager.find(User.class, id));
+    }
+
+    @Override
+    public Optional<User> findByRefreshToken(UUID refreshToken) {
+        return entityManager.createQuery("SELECT u FROM User u WHERE u.refreshToken = :refreshToken", User.class)
+                .setParameter("refreshToken", refreshToken)
+                .getResultStream()
+                .findFirst();
     }
 
     @Override
@@ -66,5 +77,10 @@ public class JpaUserRepository implements UserRepository {
         return entityManager.createQuery("SELECT COUNT(u) FROM User u WHERE u.username = :username", Long.class)
                 .setParameter("username", username)
                 .getSingleResult() > 0;
+    }
+
+    @Override
+    public User getReferenceById(UUID id) {
+        return entityManager.getReference(User.class, id);
     }
 }

@@ -17,7 +17,7 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "account_type", discriminatorType = DiscriminatorType.STRING, length = 8)
-public abstract class Account extends AbstractEntity {
+public abstract class Account extends AuditableEntity {
 
     @Id
     @Column(name = "account_number", nullable = false)
