@@ -16,29 +16,28 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
-@Inheritance(strategy = InheritanceType.JOINED)
-public abstract class Person extends AuditableEntity {
+public class Person extends AuditableEntity {
 
     @Id
     @Column(name = "id", nullable = false)
-    protected UUID id;
+    private UUID id;
 
     @Column(name = "first_name", nullable = false)
-    protected String firstName;
+    private String firstName;
 
     @Column(name = "last_name")
-    protected String lastName;
+    private String lastName;
 
     @Column(name = "email", nullable = false, unique = true)
-    protected String email;
+    private String email;
 
     @Column(name = "phone_number", nullable = false, unique = true)
-    protected String phoneNumber;
+    private String phoneNumber;
 
     @Column(name = "address", nullable = false)
-    protected String address;
+    private String address;
 
-    /*@OneToOne
-    @JoinColumn(name = "user")
-    protected User user;*/
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 }

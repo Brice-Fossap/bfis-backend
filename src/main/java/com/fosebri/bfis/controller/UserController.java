@@ -42,7 +42,7 @@ public class UserController {
     }
 
     @PATCH
-    @Path("/change-status/{id}")
+    @Path("/{id}/change-status")
     @RolesAllowed({"SUPER_ADMIN", "ADMIN", "USER"})
     public Response changeUserStatus(
             @PathParam("id") UUID userId,
