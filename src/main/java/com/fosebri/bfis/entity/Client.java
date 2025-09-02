@@ -1,18 +1,29 @@
 package com.fosebri.bfis.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.util.UUID;
+
 @Entity
-@SuperBuilder
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 @Table(name = "client")
-public class Client extends Person {
+public class Client {
 
+    @Id
+    @Column(name = "id", nullable = false)
+    private UUID id;
+
+    @Builder.Default
+    @Column(name = "enabled", nullable = false)
+    private boolean enabled = true;
+
+    @OneToOne
+    @JoinColumn(name = "person_id", nullable = false)
+    private Person person;
 }
